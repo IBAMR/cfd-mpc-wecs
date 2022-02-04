@@ -7,11 +7,12 @@ A model predictive control (MPC) integrated multiphase immersed boundary (IB) fr
 git clone https://github.com/IBAMR/cfd-mpc-wecs.git
 ```
 
+# Build PETSc with MATLAB
+Refer https://petsc.org/main/docs/manual/matlab/ (See also the Licensing the MATLAB Compute Engine on a cluster section)
+
 # Build IBAMR 
 Refer https://ibamr.github.io/
 
-# Build PETSc with MATLAB
-Refer https://petsc.org/main/docs/manual/matlab/ 
 
 # Steps to execute the CFD+MPC solver:
 
