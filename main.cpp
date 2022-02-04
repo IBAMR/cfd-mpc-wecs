@@ -372,7 +372,7 @@ main(int argc, char* argv[])
             std::cout << "Storing variables in Matlab workspace...\n" << std::endl;
             PetscMatlabEngineEvaluate(mpc->mengine,
                                       "global hydro wave mpc_interface; wave.H_wave = %f; wave.Tp = %f; wave.omega = "
-                                      "%f; wave.wave_no = %f; wave.depth = %f; mass = %f; r = %f; L = %f;",
+                                      "%f; wave.wave_no = %f; wave.depth = %f; mass = %f; r_cyl = %f; L_cyl = %f;",
                                       input_db->getDouble("HEIGHT"),
                                       input_db->getDouble("TIME_PERIOD"),
                                       input_db->getDouble("OMEGA"),
@@ -422,7 +422,7 @@ main(int argc, char* argv[])
 
             PetscMatlabEngineGetArray(mpc->mengine, 1, 1, &(mpc->m_plus_Ainf), "a");
 
-            PetscMatlabEngineGetArray(mpc->mengine, 1, 1, &(mpc->dt_controller), "h");
+            PetscMatlabEngineGetArray(mpc->mengine, 1, 1, &(mpc->dt_controller), "dt_controller");
 
             PetscMatlabEngineGetArray(mpc->mengine, 1, 1, &(mpc->mpc_start_time), "mpc_start_time");
             mpc->next_tuning_time = mpc->mpc_start_time;

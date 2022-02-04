@@ -118,7 +118,7 @@ dX = [ 0.02 ; 0.02 ; 0.02 ]; % dX = [ dx ; dy ; dz ] --> mesh size of static Car
 %% AR model parameters:
                      
 AR_order = 3;                                % order of the AR-model
-AR_start_time = 100000 * mpc_start_time;     % Use AR-model from this time onwards. 
+AR_start_time = 1 * mpc_start_time;          % Use AR-model from this time onwards. 
                                              % Set large value for switching it off 
                                              % and use analytical
                                              % expressions.
@@ -144,8 +144,8 @@ xr_old = zeros(1,hydro.order_max);
 %% Constrained MPC:
 %  ymin and ymax = [  z  ;  z_dot  ;  control_force/a  ];
 
-ymin = [   0   ;   0   ;  -300/a   ];
-ymax = [   0   ;   0   ;   300/a   ];
+ymin = [   0   ;   0   ;  -100/a   ];
+ymax = [   0   ;   0   ;   100/a   ];
 
 %% optimization method:
 % optimization_methods are 'linear' and 'non-linear'.
