@@ -3,7 +3,7 @@
 # A script to download the required BEMIO files to parse ANSYS AQWA data and generate a state space representation of the WEC
 
 # Read_AQWA.m
-wget --no-check-certificate --content-disposition https://raw.githubusercontent.com/IBAMR/cfd-mpc-wecs/main/BEMIO/Read_AQWA.m --output-document=Read_AQWA.m
+wget --no-check-certificate --content-disposition https://raw.githubusercontent.com/WEC-Sim/WEC-Sim/master/source/functions/BEMIO/Read_AQWA.m --output-document=Read_AQWA.m
 
 # Normalize.m
 wget --no-check-certificate --content-disposition https://raw.githubusercontent.com/WEC-Sim/WEC-Sim/master/source/functions/BEMIO/Normalize.m --output-document=Normalize.m 

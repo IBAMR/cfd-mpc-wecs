@@ -36,9 +36,9 @@ Refer https://petsc.org/main/docs/manual/matlab/
 
 # Steps to execute the BEM+MPC solver:
 
-1) **Generate BEM_data.mat file:** Method remains same as above.
+1) **Generate BEM_data.mat file:** See step 1 of the above section. 
 
-2) **Input file:** Details remain same as above.
+2) **Input file:** Details remain the same as above.
 
 3) **Running the simulation:** The MATLAB driver script for the BEM solver is `vcyl_driving_script.m`. Set the solver and wave parameters in this file and run the script.
 
