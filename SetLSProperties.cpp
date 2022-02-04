@@ -1,9 +1,8 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (c) 2019 - 2019 by the IBAMR developers
+// Copyright (c) 2019 - 2022 by the IBAMR developers
 // All rights reserved.
 //
-// This file is part of IBAMR.
 //
 // IBAMR is free software and is distributed under the 3-clause BSD
 // license. The full text of the license can be found in the file
@@ -11,8 +10,6 @@
 //
 // ---------------------------------------------------------------------
 
-// Filename: SetLSProperties.cpp
-// Created on Dec 17, 2017 by Nishant Nangia
 
 #include <ibamr/app_namespaces.h>
 
