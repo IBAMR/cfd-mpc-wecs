@@ -1,36 +1,9 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Copyright 2014 National Renewable Energy Laboratory and National 
-% Technology & Engineering Solutions of Sandia, LLC (NTESS). 
-% Under the terms of Contract DE-NA0003525 with NTESS, 
-% the U.S. Government retains certain rights in this software.
-% 
-% Licensed under the Apache License, Version 2.0 (the "License");
-% you may not use this file except in compliance with the License.
-% You may obtain a copy of the License at
-% 
-% http://www.apache.org/licenses/LICENSE-2.0
-% 
-% Unless required by applicable law or agreed to in writing, software
-% distributed under the License is distributed on an "AS IS" BASIS,
-% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-% See the License for the specific language governing permissions and
-% limitations under the License.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clc; clear all; close all;
-hydro = struct();
-
-%% Parse a WAMIT output file
-%hydro = Read_WAMIT(hydro,'..\..\..\tutorials\BEMIO\WAMIT\RM3\rm3.out',[]);
-
-%% Parse a NEMOH output directory
-% hydro = Read_NEMOH(hydro,'..\..\..\tutorials\BEMIO\NEMOH\RM3\');
 
 %% Parse AQWA output files
-hydro = Read_AQWA(hydro,'ANALYSIS.AH1','ANALYSIS.LIS');
-
-%% Combine multiple BEM outputs, if using multiple BEM outputs
-% hydro = Combine_BEM(hydro);
+hydro = struct();
+hydro = Read_AQWA(hydro,'AQWA_ANALYSIS.AH1','AQWA_ANALYSIS.LIS');
 
 %% Calculate the IRF for radiation
 % hydro = Radiation_IRF(hydro,t_end,n_t,n_w,w_min,w_max), [] for defaults
@@ -48,16 +21,19 @@ hydro = Excitation_IRF(hydro ,100 ,1001 ,1001 ,[] ,[]);
 %% Calculate the IRF for diffraction
 hydro = Diffraction_IRF(hydro ,100 ,1001 ,1001 ,[] ,[]);
 
-%% Write the data in standard h5 format
-Write_H5(hydro)
 
-%% Plot a few key BEMIO results *optional*
-%Plot_BEMIO(hydro)
+%% Plot a few key BEM results *optional*
+Plot_BEMIO(hydro)
 
 %% Generate file BEM_data.m:
 save('../BEM_data.mat', 'hydro');
 
-%% hydro structure
+
+
+%% hydro structure 
+%(See http://wec-sim.github.io/WEC-Sim/master/user/advanced_features.html#user-advanced-features-bemio)
+
+
 % A       : [sum(dof),sum(dof),Nf]           : added mass
 % Ainf    : [sum(dof),sum(dof)]              : infinite frequency added mass
 % B       : [sum(dof),sum(dof),Nf]           : radiation damping
