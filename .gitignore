@@ -1,0 +1,11 @@
+*.DS_Store
+*.d
+*.o
+*.log
+viz*
+main3d
+Dump*
+restart*
+probe*
+*.curve
+irregular*
