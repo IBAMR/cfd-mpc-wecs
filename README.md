@@ -1,5 +1,5 @@
 # cfd-mpc-wecs
-A model predictive control (MPC) integrated multiphase immersed boundary (IB) framework for simulating wave energy converters (WEC) 
+A model predictive control (MPC) integrated multiphase immersed boundary (IB) framework for simulating wave energy converters (WECs) 
 
 ### Clone the repository
 
@@ -10,17 +10,17 @@ git clone https://github.com/IBAMR/cfd-mpc-wecs.git
 # Build PETSc with MATLAB
 Refer https://petsc.org/main/docs/manual/matlab/ (See also the Licensing the MATLAB Compute Engine on a cluster section)
 
-# Build IBAMR 
+# Build IBAMR with PETSc (and other libraries)
 Refer https://ibamr.github.io/
 
 
 # Steps to execute the CFD+MPC solver:
 
-1) **Generate BEM_data.mat file:** First excute the shell script `BEM_data/get_bemio_files.sh` to download some mising code files. It assumes the UNIX command `wget`is available on the system.  Next, execute the MATLAB script `BEM_data/process_bem_data.m`  to generate the BEM_data.mat file. The two scripts are located in the `BEM_data` directory. The directory also contains the output from ANSYS AQWA software for the 1:20 scaled cylinder: `AQWA_ANALYSIS.AH` and `AQWA_ANALYSIS.LIS` 
+1) **Generate BEM_data.mat file:** First excute the shell script `BEM_data/get_bemio_files.sh` to download some mising code files. It assumes the UNIX command `wget`is available on the system. If not, `wget` can be replaced by the `curl` command, or even a manual download can be performed following the links given in the  `get_bemio_files.sh` file. Next, execute the MATLAB script `BEM_data/process_bem_data.m`  to generate the `BEM_data.mat` file. The two scripts are located in the `BEM_data` directory. The directory also contains the output from the ANSYS AQWA software for the 1:20 scaled cylinder: `AQWA_ANALYSIS.AH` and `AQWA_ANALYSIS.LIS` 
 
 2) **Input files:** The CFD solver requires an input file. Two sample input files are provided in the main directory with the names `input3d.cyl` for first-order order regular waves and `input3d_irregwave.cyl` for irregular waves. The input files are set to simulate the AR-enabled CFD cases given in Sec. 9.2 of the paper.
 
-3) **C++ driver code (main.cpp):** The BEM data and the MPC parameters are loaded by the `load_mpc_paramters.m` MATLAB script called within `main.cpp`. Similarly, the MATLAB MPC routines contained in the `MPC_matlab_code` directory are also called within the C++ driver code.   
+3) **C++ driver code (main.cpp):** The BEM data and the MPC parameters are loaded by the `load_mpc_paramters.m` MATLAB script called within `main.cpp`. Currently, `load_mpc_paramters.m` corresponds to regular waves of Sec. 9.2. Similarly, the MATLAB MPC routines contained in the `MPC_matlab_code` directory are also called within the C++ driver code.   
 
 3) **Building and linking the executable:** Use the command `make main3d` to compile the CFD code and link it with IBAMR. Modify the IBAMR source and build directory paths in the provided Makefile. For more details refer to https://ibamr.github.io/linking
 
@@ -39,8 +39,8 @@ Refer https://ibamr.github.io/
 
 1) **Generate BEM_data.mat file:** See step 1 of the above section. 
 
-2) **Input file:** Details remain the same as above.
+2) **Input file:** The BEM code does not require an input file. Instead, the `load_mpc_parameters.m`script should be modified directly to adjust the MPC paramaters.
 
 3) **Running the simulation:** The MATLAB driver script for the BEM solver is `vcyl_driving_script.m`. Set the solver and wave parameters in this file and run the script.
 
-4) **output Data:** Results are saved in `BEM_results.mat` file. This includes the simulation time, WEC displacement and velocity, wave excitation and control force.
+4) **Output data:** Results are saved in `BEM_results.mat` file. This includes the simulation time, WEC displacement and velocity, wave excitation and control force.
