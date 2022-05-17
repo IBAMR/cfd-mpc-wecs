@@ -31,19 +31,11 @@
 #include <StandardTagAndInitialize.h>
 
 // Headers for application-specific algorithm/data structure objects
-#include <ibamr/AdvDiffPredictorCorrectorHierarchyIntegrator.h>
 #include <ibamr/AdvDiffSemiImplicitHierarchyIntegrator.h>
 #include <ibamr/BrinkmanPenalizationRigidBodyDynamics.h>
-#include <ibamr/FESurfaceDistanceEvaluator.h>
 #include <ibamr/FirstOrderStokesWaveGenerator.h>
-#include <ibamr/IBFEMethod.h>
-#include <ibamr/IBInterpolantHierarchyIntegrator.h>
-#include <ibamr/IBInterpolantMethod.h>
-#include <ibamr/IBLevelSetMethod.h>
-#include <ibamr/IBRedundantInitializer.h>
 #include <ibamr/INSVCStaggeredConservativeHierarchyIntegrator.h>
 #include <ibamr/INSVCStaggeredHierarchyIntegrator.h>
-#include <ibamr/INSVCStaggeredNonConservativeHierarchyIntegrator.h>
 #include <ibamr/IrregularWaveBcCoef.h>
 #include <ibamr/IrregularWaveGenerator.h>
 #include <ibamr/RelaxationLSMethod.h>
@@ -70,8 +62,6 @@
 #include "SetLSProperties.h"
 #include "TagLSRefinementCells.h"
 
-int coarsest_ln, max_finest_ln;
-double dx, ds;
 
 CylinderInterface cylinder;
 
@@ -434,66 +424,16 @@ main(int argc, char* argv[])
         // Create major algorithm and data objects that comprise the
         // application.  These objects are configured from the input database
         // and, if this is a restarted run, from the restart database.
-        Pointer<INSVCStaggeredHierarchyIntegrator> navier_stokes_integrator;
-        const string discretization_form =
-            app_initializer->getComponentDatabase("Main")->getString("discretization_form");
-        const bool conservative_form = (discretization_form == "CONSERVATIVE");
-        if (conservative_form)
-        {
-            navier_stokes_integrator = new INSVCStaggeredConservativeHierarchyIntegrator(
+        Pointer<INSVCStaggeredHierarchyIntegrator> navier_stokes_integrator =  new INSVCStaggeredConservativeHierarchyIntegrator(
                 "INSVCStaggeredConservativeHierarchyIntegrator",
                 app_initializer->getComponentDatabase("INSVCStaggeredConservativeHierarchyIntegrator"));
-        }
-        else if (!conservative_form)
-        {
-            navier_stokes_integrator = new INSVCStaggeredNonConservativeHierarchyIntegrator(
-                "INSVCStaggeredNonConservativeHierarchyIntegrator",
-                app_initializer->getComponentDatabase("INSVCStaggeredNonConservativeHierarchyIntegrator"));
-        }
-        else
-        {
-            TBOX_ERROR("Unsupported solver type: " << discretization_form << "\n"
-                                                   << "Valid options are: CONSERVATIVE, NON_CONSERVATIVE");
-        }
 
         // Set up the advection diffusion hierarchy integrator
-        Pointer<AdvDiffHierarchyIntegrator> adv_diff_integrator;
-        const string adv_diff_solver_type = app_initializer->getComponentDatabase("Main")->getStringWithDefault(
-            "adv_diff_solver_type", "PREDICTOR_CORRECTOR");
-        if (adv_diff_solver_type == "PREDICTOR_CORRECTOR")
-        {
-            Pointer<AdvectorExplicitPredictorPatchOps> predictor = new AdvectorExplicitPredictorPatchOps(
-                "AdvectorExplicitPredictorPatchOps",
-                app_initializer->getComponentDatabase("AdvectorExplicitPredictorPatchOps"));
-            adv_diff_integrator = new AdvDiffPredictorCorrectorHierarchyIntegrator(
-                "AdvDiffPredictorCorrectorHierarchyIntegrator",
-                app_initializer->getComponentDatabase("AdvDiffPredictorCorrectorHierarchyIntegrator"),
-                predictor);
-        }
-        else if (adv_diff_solver_type == "SEMI_IMPLICIT")
-        {
-            adv_diff_integrator = new AdvDiffSemiImplicitHierarchyIntegrator(
+        Pointer<AdvDiffHierarchyIntegrator> adv_diff_integrator = new AdvDiffSemiImplicitHierarchyIntegrator(
                 "AdvDiffSemiImplicitHierarchyIntegrator",
                 app_initializer->getComponentDatabase("AdvDiffSemiImplicitHierarchyIntegrator"));
-        }
-        else
-        {
-            TBOX_ERROR("Unsupported solver type: " << adv_diff_solver_type << "\n"
-                                                   << "Valid options are: PREDICTOR_CORRECTOR, SEMI_IMPLICIT");
-        }
         navier_stokes_integrator->registerAdvDiffHierarchyIntegrator(adv_diff_integrator);
 
-        Pointer<IBFEMethod> ibfe_method_ops = nullptr;
-        Pointer<IBInterpolantMethod> ib_interpolant_method_ops = new IBInterpolantMethod(
-            "IBInterpolantMethod", app_initializer->getComponentDatabase("IBInterpolantMethod"));
-        Pointer<IBLevelSetMethod> ib_level_set_method_ops =
-            new IBLevelSetMethod(ib_interpolant_method_ops, ibfe_method_ops);
-
-        Pointer<IBHierarchyIntegrator> time_integrator = new IBInterpolantHierarchyIntegrator(
-            "IBInterpolantHierarchyIntegrator",
-            app_initializer->getComponentDatabase("IBInterpolantHierarchyIntegrator"),
-            ib_level_set_method_ops,
-            navier_stokes_integrator);
 
         Pointer<CartesianGridGeometry<NDIM> > grid_geometry = new CartesianGridGeometry<NDIM>(
             "CartesianGeometry", app_initializer->getComponentDatabase("CartesianGeometry"));
@@ -501,7 +441,7 @@ main(int argc, char* argv[])
 
         Pointer<StandardTagAndInitialize<NDIM> > error_detector =
             new StandardTagAndInitialize<NDIM>("StandardTagAndInitialize",
-                                               time_integrator,
+                                               navier_stokes_integrator,
                                                app_initializer->getComponentDatabase("StandardTagAndInitialize"));
         Pointer<BergerRigoutsos<NDIM> > box_generator = new BergerRigoutsos<NDIM>();
         Pointer<LoadBalancer<NDIM> > load_balancer =
@@ -557,15 +497,7 @@ main(int argc, char* argv[])
 
         // Setup the advected and diffused fluid quantities.
         Pointer<CellVariable<NDIM, double> > mu_var = new CellVariable<NDIM, double>("mu");
-        Pointer<hier::Variable<NDIM> > rho_var;
-        if (conservative_form)
-        {
-            rho_var = new SideVariable<NDIM, double>("rho");
-        }
-        else
-        {
-            rho_var = new CellVariable<NDIM, double>("rho");
-        }
+        Pointer<hier::Variable<NDIM> > rho_var = new SideVariable<NDIM, double>("rho");
         navier_stokes_integrator->registerMassDensityVariable(rho_var);
         navier_stokes_integrator->registerViscosityVariable(mu_var);
 
@@ -622,9 +554,9 @@ main(int argc, char* argv[])
         ls_solid_tagger.d_tag_value = tag_value;
         ls_solid_tagger.d_tag_abs_thresh = tag_thresh;
         ls_solid_tagger.d_adv_diff_solver = adv_diff_integrator;
-        time_integrator->registerApplyGradientDetectorCallback(&callTagGasLSRefinementCellsCallbackFunction,
+        navier_stokes_integrator->registerApplyGradientDetectorCallback(&callTagGasLSRefinementCellsCallbackFunction,
                                                                static_cast<void*>(&ls_gas_tagger));
-        time_integrator->registerApplyGradientDetectorCallback(&callTagSolidLSRefinementCellsCallbackFunction,
+        navier_stokes_integrator->registerApplyGradientDetectorCallback(&callTagSolidLSRefinementCellsCallbackFunction,
                                                                static_cast<void*>(&ls_solid_tagger));
 
         // Create Eulerian initial condition specification objects.
@@ -665,8 +597,6 @@ main(int argc, char* argv[])
                 bc_coefs_db_name_stream << "VelocityBcCoefs_" << d;
                 const string bc_coefs_db_name = bc_coefs_db_name_stream.str();
 
-                // u_bc_coefs[d] = new muParserRobinBcCoefs(
-                //    bc_coefs_name, app_initializer->getComponentDatabase(bc_coefs_db_name), grid_geometry);
                 if (wave_type == "FIRST_ORDER_STOKES")
                 {
                     u_bc_coefs[d] = new StokesFirstOrderWaveBcCoef(
@@ -736,12 +666,12 @@ main(int argc, char* argv[])
         const string wave_damping_method = input_db->getStringWithDefault("WAVE_DAMPING_METHOD", "RELAXATION");
         if (wave_damping_method == "RELAXATION")
         {
-            time_integrator->registerPostprocessIntegrateHierarchyCallback(
+            navier_stokes_integrator->registerPostprocessIntegrateHierarchyCallback(
                 &WaveDampingFunctions::callRelaxationZoneCallbackFunction, static_cast<void*>(&wave_damper));
         }
         else if (wave_damping_method == "CONSERVING")
         {
-            time_integrator->registerPostprocessIntegrateHierarchyCallback(
+            navier_stokes_integrator->registerPostprocessIntegrateHierarchyCallback(
                 &WaveDampingFunctions::callConservedWaveAbsorbingCallbackFunction, static_cast<void*>(&wave_damper));
         }
         else
@@ -779,7 +709,7 @@ main(int argc, char* argv[])
             wave_generator->d_wave_gen_data.d_adv_diff_hier_integrator = adv_diff_integrator;
             wave_generator->d_wave_gen_data.d_phi_var = phi_var_gas;
 
-            time_integrator->registerPostprocessIntegrateHierarchyCallback(
+            navier_stokes_integrator->registerPostprocessIntegrateHierarchyCallback(
                 &WaveGenerationFunctions::callStokesWaveRelaxationCallbackFunction, static_cast<void*>(wave_generator));
         }
 
@@ -818,19 +748,7 @@ main(int argc, char* argv[])
         eul_forces->addFunction(grav_force);
         eul_forces->addFunction(surface_tension_force);
         eul_forces->addFunction(sponge_fcn);
-        time_integrator->registerBodyForceFunction(eul_forces);
-
-        // Configure the IBInterpolant solver.
-        Pointer<IBRedundantInitializer> ib_initializer = new IBRedundantInitializer(
-            "IBRedundantInitializer", app_initializer->getComponentDatabase("IBRedundantInitializer"));
-        std::vector<std::string> struct_list_vec(1, "InterpolationMesh");
-        coarsest_ln = 0;
-        max_finest_ln = input_db->getInteger("MAX_LEVELS") - 1;
-        ib_initializer->setStructureNamesOnLevel(max_finest_ln, struct_list_vec);
-        ib_initializer->registerInitStructureFunction(generate_interp_mesh);
-        ib_interpolant_method_ops->registerLInitStrategy(ib_initializer);
-        ib_interpolant_method_ops->registerVariableAndHierarchyIntegrator(
-            ls_name_solid, /*depth*/ 1, phi_var_solid, adv_diff_integrator);
+        navier_stokes_integrator->registerBodyForceFunction(eul_forces);
 
         // Configure the Brinkman penalization object to do the rigid body dynamics.
         Pointer<BrinkmanPenalizationRigidBodyDynamics> bp_rbd =
@@ -853,20 +771,15 @@ main(int argc, char* argv[])
 
         // Set up visualization plot file writers.
         Pointer<VisItDataWriter<NDIM> > visit_data_writer = app_initializer->getVisItDataWriter();
-        Pointer<LSiloDataWriter> silo_data_writer = app_initializer->getLSiloDataWriter();
         if (uses_visit)
         {
-            ib_initializer->registerLSiloDataWriter(silo_data_writer);
-            time_integrator->registerVisItDataWriter(visit_data_writer);
-            ib_interpolant_method_ops->registerLSiloDataWriter(silo_data_writer);
+            navier_stokes_integrator->registerVisItDataWriter(visit_data_writer);
         }
 
         // Initialize hierarchy configuration and data on all patches.
-        time_integrator->initializePatchHierarchy(patch_hierarchy, gridding_algorithm);
+        navier_stokes_integrator->initializePatchHierarchy(patch_hierarchy, gridding_algorithm);
 
         // Deallocate initialization objects.
-        ib_interpolant_method_ops->freeLInitStrategy();
-        ib_initializer.setNull();
         app_initializer.setNull();
 
         // Print the input database contents to the log file.
@@ -874,22 +787,17 @@ main(int argc, char* argv[])
         input_db->printClassData(plog);
 
         // Write out initial visualization data.
-        int iteration_num = time_integrator->getIntegratorStep();
-        double loop_time = time_integrator->getIntegratorTime();
+        int iteration_num = navier_stokes_integrator->getIntegratorStep();
+        double loop_time = navier_stokes_integrator->getIntegratorTime();
 
-        if (!RestartManager::getManager()->isFromRestart())
-        {
-            navier_stokes_integrator->initializeCompositeHierarchyData(loop_time, /*initial_time*/ true);
-        }
 
         if (dump_viz_data)
         {
             pout << "\n\nWriting visualization files...\n\n";
             if (uses_visit)
             {
-                time_integrator->setupPlotData();
+                navier_stokes_integrator->setupPlotData();
                 visit_data_writer->writePlotData(patch_hierarchy, iteration_num, loop_time);
-                silo_data_writer->writePlotData(iteration_num, loop_time);
             }
         }
 
@@ -930,23 +838,25 @@ main(int argc, char* argv[])
         }
 
         // Main time step loop.
-        double loop_time_end = time_integrator->getEndTime();
+        double loop_time_end = navier_stokes_integrator->getEndTime();
         double dt = 0.0;
-        while (!MathUtilities<double>::equalEps(loop_time, loop_time_end) && time_integrator->stepsRemaining())
+        int coarsest_ln = 0;
+        int max_finest_ln = input_db->getInteger("MAX_LEVELS") - 1;
+        while (!MathUtilities<double>::equalEps(loop_time, loop_time_end) && navier_stokes_integrator->stepsRemaining())
         {
-            iteration_num = time_integrator->getIntegratorStep();
-            loop_time = time_integrator->getIntegratorTime();
+            iteration_num = navier_stokes_integrator->getIntegratorStep();
+            loop_time = navier_stokes_integrator->getIntegratorTime();
 
             pout << "\n";
             pout << "+++++++++++++++++++++++++++++++++++++++++++++++++++\n";
             pout << "At beginning of timestep # " << iteration_num << "\n";
             pout << "Simulation time is " << loop_time << "\n";
 
-            dt = time_integrator->getMaximumTimeStepSize();
+            dt = navier_stokes_integrator->getMaximumTimeStepSize();
             mpc->dt_cfd_current = dt;
             pout << "Advancing hierarchy with timestep size dt = " << dt << "\n";
 
-            time_integrator->advanceHierarchy(dt);
+            navier_stokes_integrator->advanceHierarchy(dt);
             loop_time += dt;
 
             pout << "\n";
@@ -1005,13 +915,12 @@ main(int argc, char* argv[])
             // At specified intervals, write visualization and restart files,
             // and print out timer data.
             iteration_num += 1;
-            const bool last_step = !time_integrator->stepsRemaining();
+            const bool last_step = !navier_stokes_integrator->stepsRemaining();
             if (dump_viz_data && uses_visit && (iteration_num % viz_dump_interval == 0 || last_step))
             {
                 pout << "Writing visualization files...\n\n";
-                time_integrator->setupPlotData();
+                navier_stokes_integrator->setupPlotData();
                 visit_data_writer->writePlotData(patch_hierarchy, iteration_num, loop_time);
-                silo_data_writer->writePlotData(iteration_num, loop_time);
             }
             if (dump_restart_data && (iteration_num % restart_dump_interval == 0 || last_step))
             {

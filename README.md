@@ -11,12 +11,12 @@ git clone https://github.com/IBAMR/cfd-mpc-wecs.git
 Refer https://petsc.org/main/docs/manual/matlab/ (See also the Licensing the MATLAB Compute Engine on a cluster section)
 
 # Build IBAMR with PETSc (and other libraries)
-Refer https://ibamr.github.io/
+Refer https://ibamr.github.io/building
 
 
 # Steps to execute the CFD+MPC solver:
 
-1) **Generate BEM_data.mat file:** First excute the shell script `BEM_data/get_bemio_files.sh` to download some mising code files. It assumes the UNIX command `wget`is available on the system. If not, `wget` can be replaced by the `curl` command, or even a manual download can be performed following the links given in the  `get_bemio_files.sh` file. Next, execute the MATLAB script `BEM_data/process_bem_data.m`  to generate the `BEM_data.mat` file. The two scripts are located in the `BEM_data` directory. The directory also contains the output from the ANSYS AQWA software for the 1:20 scaled cylinder: `AQWA_ANALYSIS.AH` and `AQWA_ANALYSIS.LIS` 
+1) **Generate BEM_data.mat file:** Go to the `BEM_data` directory. Excute the shell script `get_bemio_files.sh` to download some mising code files. It assumes the UNIX command `wget`is available on the system. If not, `wget` can be replaced by the `curl` command, or even a manual download can be performed following the links given in the  `get_bemio_files.sh` file. Next, execute the MATLAB script `process_bem_data.m`  to generate the `BEM_data.mat` file in the `BEM_data` directory. The directory also contains the output from the ANSYS AQWA software for the 1:20 scaled cylinder: `AQWA_ANALYSIS.AH` and `AQWA_ANALYSIS.LIS` 
 
 2) **Input files:** The CFD solver requires an input file. Two sample input files are provided in the main directory with the names `input3d.cyl` for first-order order regular waves and `input3d_irregwave.cyl` for irregular waves. The input files are set to simulate the AR-enabled CFD cases given in Sec. 9.2 of the paper.
 
