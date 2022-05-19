@@ -49,6 +49,7 @@
 #include <ibtk/AppInitializer.h>
 #include <ibtk/CartGridFunctionSet.h>
 #include <ibtk/HierarchyMathOps.h>
+#include <ibtk/IndexUtilities.h>
 #include <ibtk/muParserCartGridFunction.h>
 #include <ibtk/muParserRobinBcCoefs.h>
 
@@ -103,7 +104,6 @@ AR_Interface* AR_interface;
 // Struct to reset solid level set
 struct SolidLevelSetResetter
 {
-    Pointer<IBInterpolantMethod> ib_interp_ops;
     Pointer<AdvDiffHierarchyIntegrator> adv_diff_integrator;
     Pointer<CellVariable<NDIM, double> > ls_solid_var;
     Pointer<BrinkmanPenalizationRigidBodyDynamics> bp_rbd;
@@ -113,7 +113,6 @@ void
 reset_solid_level_set_callback_fcn(double current_time, double new_time, int /*cycle_num*/, void* ctx)
 {
     SolidLevelSetResetter* resetter = static_cast<SolidLevelSetResetter*>(ctx);
-    resetter->ib_interp_ops->copyEulerianDataToIntegrator(new_time);
 
     // Get the new centroid of the body
     const double dt = new_time - current_time;
@@ -296,8 +295,8 @@ external_force_torque(double data_time, int cycle_num, Eigen::Vector3d& F, Eigen
 int
 main(int argc, char* argv[])
 {
-    // Initialize libMesh, PETSc, MPI, and SAMRAI.
-    LibMeshInit init(argc, argv);
+    // Initialize PETSc, MPI, and SAMRAI.
+    PetscInitialize(&argc, &argv, NULL, NULL);
     SAMRAI_MPI::setCommunicator(PETSC_COMM_WORLD);
     SAMRAI_MPI::setCallAbortInSerialInsteadOfExit();
     SAMRAIManager::startup();
@@ -489,7 +488,6 @@ main(int argc, char* argv[])
         adv_diff_integrator->setInitialConditions(phi_var_solid, phi_solid_init);
 
         SolidLevelSetResetter solid_level_set_resetter;
-        solid_level_set_resetter.ib_interp_ops = ib_interpolant_method_ops;
         solid_level_set_resetter.adv_diff_integrator = adv_diff_integrator;
         solid_level_set_resetter.ls_solid_var = phi_var_solid;
         adv_diff_integrator->registerIntegrateHierarchyCallback(&reset_solid_level_set_callback_fcn,
