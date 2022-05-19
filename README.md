@@ -16,7 +16,7 @@ Refer https://ibamr.github.io/building
 
 # Steps to execute the CFD+MPC solver:
 
-1) **Generate BEM_data.mat file:** Go to the `BEM_data` directory. Execute the MATLAB script `process_bem_data.m` to generate the `BEM_data.mat` file. The directory also contains the output from the ANSYS AQWA software for the 1:20 scaled cylinder: `AQWA_ANALYSIS.AH` and `AQWA_ANALYSIS.LIS`. The files in the BEM_data directory can also be found at https://github.com/WEC-Sim/WEC-Sim/tree/master/source/functions/BEMIO link. The files from BEMIO directory are being used under the Apache License Version 2.0, present at cfd-mpc-wecs/BEMIO/LICENSE.
+1) **Generate BEM_data.mat file:** Go to the `BEM_data` directory. Execute the MATLAB script `process_bem_data.m` to generate the `BEM_data.mat` file. The directory also contains the output from the ANSYS AQWA software for the 1:20 scaled cylinder: `AQWA_ANALYSIS.AH` and `AQWA_ANALYSIS.LIS`. The files in the BEM_data directory can also be found at https://github.com/WEC-Sim/WEC-Sim/tree/master/source/functions/BEMIO link. The files from BEMIO directory are being used under the Apache License Version 2.0, present at cfd-mpc-wecs/BEM_data/LICENSE.
 
 2) **Input files:** The CFD solver requires an input file. Two sample input files are provided in the main directory with the names `input3d.cyl` for first-order order regular waves and `input3d_irregwave.cyl` for irregular waves. The input files are set to simulate the AR-enabled CFD cases given in Sec. 9.2 of the paper.
 
