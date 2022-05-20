@@ -9,6 +9,11 @@ git clone https://github.com/IBAMR/cfd-mpc-wecs.git
 
 # Build PETSc with MATLAB
 Refer https://petsc.org/main/docs/manual/matlab/ (See also the Licensing the MATLAB Compute Engine on a cluster section)
+Add the following configure options when building PETSc (See also **Build IBAMR with PETSc** section)
+
+```
+--with-matlab-dir=/PATH_to_MATLAB_directory --with-matlab-engine=1 --with-matlab-engine-dir=/PATH_to_MATLAB_directory/extern/engines/
+```
 
 # Build IBAMR with PETSc (and other libraries)
 Refer https://ibamr.github.io/building
