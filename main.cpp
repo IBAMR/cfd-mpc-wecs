@@ -168,16 +168,6 @@ reset_solid_level_set_callback_fcn(double current_time, double new_time, int /*c
 }
 
 void
-generate_interp_mesh(const unsigned int& /*strct_num*/,
-                     const int& /*ln*/,
-                     int& /*num_vertices*/,
-                     std::vector<IBTK::Point>& /*vertex_posn*/)
-{
-    return;
-
-} // generate_interp_mesh
-
-void
 imposed_kinematics(double /*data_time*/,
                    int /*cycle_num*/,
                    Eigen::Vector3d& U_com,
@@ -342,9 +332,8 @@ main(int argc, char* argv[])
         cylinder.mass = input_db->getDouble("MASS");
         cylinder.X0[0] = input_db->getDouble("XCOM");
         cylinder.X0[1] = input_db->getDouble("YCOM");
-#if (NDIM == 3)
         cylinder.X0[2] = input_db->getDouble("ZCOM");
-#endif
+
 
         // Model Predictive Control information
         mpc = new MPC_Interface;
@@ -818,9 +807,7 @@ main(int argc, char* argv[])
 
                 *probe_streams[i] << "Printing level set at cell center closest to point (" << probe_points[i][0]
                                   << ", " << probe_points[i][1]
-#if (NDIM == 3)
                                   << ", " << probe_points[i][2]
-#endif
                                   << ") " << std::endl;
                 probe_streams[i]->precision(10);
             }
