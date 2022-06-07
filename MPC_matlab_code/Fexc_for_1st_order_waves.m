@@ -16,7 +16,7 @@ for i = 1 : length(TIME)
                              - wave.omega * (TIME(i) - tau2(j)) );
        y2(j, i) = eta_exact(j, i) * K_e(1, j);
    end
-   Fexc_exact(i) = trapz(t2, y2(:, i)) * 1025 * 9.81; 
+   Fexc_exact(i) = trapz(t2, y2(:, i)) * hydro.rho * hydro.g; 
 end
 
 F_exc = Fexc_exact';
