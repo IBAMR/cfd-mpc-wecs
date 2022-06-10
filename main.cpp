@@ -342,9 +342,9 @@ main(int argc, char* argv[])
         if (SAMRAI_MPI::getRank() == 0)
         {
             std::cout << "\nStarting Matlab engine...\n" << std::endl;
-            PetscMatlabEngineCreate(PETSC_COMM_SELF, "master", &(mpc->mengine));
+            PetscMatlabEngineCreate(PETSC_COMM_SELF, NULL, &(mpc->mengine));
             std::cout << "Matlab engine started" << std::endl;
-            PetscMatlabEngineEvaluate(mpc->mengine, "clc;  clear all;  close all;  addpath([cd,'/MPC_matlab_code'])");
+            PetscMatlabEngineEvaluate(mpc->mengine, "clc;  clear all;  close all;  addpath('./MPC_matlab_code')");
 
             std::cout << "Storing variables in Matlab workspace...\n" << std::endl;
             PetscMatlabEngineEvaluate(mpc->mengine,
