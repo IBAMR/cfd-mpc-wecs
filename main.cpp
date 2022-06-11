@@ -342,9 +342,23 @@ main(int argc, char* argv[])
         if (SAMRAI_MPI::getRank() == 0)
         {
             std::cout << "\nStarting Matlab engine...\n" << std::endl;
-            PetscMatlabEngineCreate(PETSC_COMM_SELF, NULL, &(mpc->mengine));
+            
+            // There are two ways of starting MATLAB engine: 
+            // (1) NULL hostname  --> What we recommend
+            // (2) With a specific hostname using shell command 'hostname' ---> commented out
+            
+            // With NULL hostname
+            PetscMatlabEngineCreate(PETSC_COMM_SELF,/*hostname*/ NULL, &(mpc->mengine));     
+            // If using a specific hostname e.g., "master"   
+            //PetscMatlabEngineCreate(PETSC_COMM_SELF, "master", &(mpc->mengine));
             std::cout << "Matlab engine started" << std::endl;
+
+            // Add relative path with NULL hostname
             PetscMatlabEngineEvaluate(mpc->mengine, "clc;  clear all;  close all;  addpath('./MPC_matlab_code')");
+            // If using a  specific hostname add the full path of current directory and MPC_matlab_code subdirectory.   
+            // Again there are two ways: Add individually or recursively
+            //PetscMatlabEngineEvaluate(mpc->mengine, "clc;  clear all;  close all;  addpath('/path/to/cfd-mpc-wecs'); addpath('/path/to/cfd-mpc-wecs/MPC_matlab_code')");
+            //PetscMatlabEngineEvaluate(mpc->mengine, "clc;  clear all;  close all;  addpath(genpath('/path/to/cfd-mpc-wecs'))");
 
             std::cout << "Storing variables in Matlab workspace...\n" << std::endl;
             PetscMatlabEngineEvaluate(mpc->mengine,
