@@ -31,7 +31,35 @@ export PETSC_ARCH=linux-opt
 ```
 
 # Build IBAMR with PETSc (and other libraries)
-Refer https://ibamr.github.io/building
+
+Building IBAMR using autotools
+
+```
+cd $HOME/sfw
+git clone https://github.com/IBAMR/IBAMR.git IBAMR
+
+mkdir objs-opt
+cd objs-opt
+
+../IBAMR/configure \
+CFLAGS="-g -O3 -Wall" \
+CXXFLAGS="-g -O3 -Wall" \
+FCFLAGS="-g -O3 -Wall" \
+CC=mpicc \
+CXX=mpicxx \
+FC=mpif90 \
+--with-samrai=$HOME/sfw/SAMRAI/linux-opt \
+--with-hdf5=$HOME/sfw/HDF5 \
+--with-silo=$HOME/sfw/SILO \ 
+--with-boost=$HOME/sfw/boost/1.67.0 \ 
+PETSC_DIR=$HOME/sfw/PETSc-MATLAB \
+PETSC_ARCH=linux-opt 
+
+make -j56
+
+```
+
+It is also possible to build IBAMR using CMake (Refer https://ibamr.github.io/building)
 
 
 # Steps to execute the CFD+MPC solver:
@@ -42,7 +70,7 @@ Refer https://ibamr.github.io/building
 
 3) **C++ driver code (main.cpp):** The BEM data and the MPC parameters are loaded by the `load_mpc_paramters.m` MATLAB script called within `main.cpp`. Currently, `load_mpc_paramters.m` corresponds to regular waves of Sec. 9.2. Similarly, the MATLAB MPC routines contained in the `MPC_matlab_code` directory are also called within the C++ driver code.   
 
-3) **Building and linking the executable:** Use the command `make main3d` to compile the CFD code and link it with IBAMR. Modify the IBAMR source and build directory paths in the provided Makefile. For more details refer to https://ibamr.github.io/linking
+3) **Building and linking the executable:** Use the command `make main3d` to compile the CFD code and link it with IBAMR. Modify the IBAMR source and build directory paths in the provided Makefile, which assumes that IBAMR is built using autotools. If IBAMR is built using CMake, then a CMakeLists.txt should be used as explained here https://ibamr.github.io/linking
 
 4) **Run the simulation:** Use the command `mpirun -np 128 ./main3d input3d.cyl` to run the simulation with 128 processors (number of processors can be adjusted here). 
 
