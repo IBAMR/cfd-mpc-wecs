@@ -70,11 +70,11 @@ It is also possible to build IBAMR using CMake (Refer https://ibamr.github.io/bu
 
 3) **C++ driver code (main.cpp):** The BEM data and the MPC parameters are loaded by the `load_mpc_paramters.m` MATLAB script called within `main.cpp`. Currently, `load_mpc_paramters.m` corresponds to regular waves of Sec. 9.2. Similarly, the MATLAB MPC routines contained in the `MPC_matlab_code` directory are also called within the C++ driver code.   
 
-3) **Building and linking the executable:** Use the command `make -j8 main3d` to compile the CFD code and link it with IBAMR. Modify the IBAMR source and build directory paths in the provided Makefile.autotools, which assumes that IBAMR is built using autotools. The file contents should be copied to a new file named Makefile in the same directory.
+3) **Building and linking the executable:** If IBAMR is built using autotools then: (1) Copy `Makefile.autotools` to a new file named `Makefile` in the same directory. Modify the IBAMR source and build directory paths at top of the file. (2) Use the command `make -j8 main3d` to compile the CFD code and link it with IBAMR. 
 
-If IBAMR is built using CMake, then the CMakeLists.txt should be used instead. The CMake project can be configured using the command `cmake -DIBAMR_ROOT=/path/to/ibamr-install -S ./` and then built using `make -j8 main3d`. 
+     If IBAMR is built using CMake, then the CMakeLists.txt should be used instead. The CMake project can be configured using the command `cmake -DIBAMR_ROOT=/path/to/ibamr-install -S ./` and then built using `make -j8 main3d`. 
 
-The linking of IBAMR based applications using autotools and CMake are explained here https://ibamr.github.io/linking
+     The linking of IBAMR based applications using autotools and CMake are explained here https://ibamr.github.io/linking
 
 4) **Run the simulation:** Use the command `mpirun -np 128 ./main3d input3d.cyl` to run the simulation with 128 processors (number of processors can be adjusted here). 
 
