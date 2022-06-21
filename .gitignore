@@ -10,3 +10,6 @@ probe*
 *.curve
 irregular*
 *.mat
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
