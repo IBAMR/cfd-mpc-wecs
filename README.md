@@ -1,6 +1,24 @@
 # cfd-mpc-wecs
 A model predictive control (MPC) integrated multiphase immersed boundary (IB) framework for simulating wave energy converters (WECs) 
 
+
+## Citing
+
+If you are using MATLAB or CFD codes from this repository in your work, please consider citing the following
+```
+@article{khedkar2022model,
+  title={{A model predictive control (MPC)-integrated multiphase immersed boundary (IB) framework for simulating wave energy converters (WECs)}},
+  author={Khedkar, Kaustubh and Bhalla, Amneet Pal Singh},
+  journal={Ocean Engineering},
+  volume={260},
+  pages={111908},
+  year={2022},
+  publisher={Elsevier},
+  doi = {10.1016/j.oceaneng.2022.111908},
+  URL = {https://www.sciencedirect.com/science/article/pii/S0029801822012471}
+}
+```
+
 ### Clone the repository
 
 ```
