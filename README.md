@@ -1,5 +1,5 @@
 # cfd-mpc-wecs
-A model predictive control (MPC) integrated multiphase immersed boundary (IB) framework for simulating wave energy converters (WECs) 
+A model predictive control (MPC) integrated multiphase immersed boundary (IB) framework for simulating wave energy converters (WECs) as described in https://doi.org/10.1016/j.oceaneng.2022.111908
 
 
 ## Citing
